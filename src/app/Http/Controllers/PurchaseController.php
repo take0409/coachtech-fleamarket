@@ -42,7 +42,7 @@ class PurchaseController extends Controller
     }
 
     /**
-     * 購入確定処理（Stripe決済画面へリダイレクト）
+     * 購入確定処理（Stripe決済画面へ接続：FN023）
      */
     public function store(Request $request, $item_id)
     {
@@ -56,7 +56,7 @@ class PurchaseController extends Controller
         // Stripe秘密鍵の設定
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        // 支払い方法の判定（Stripeの形式に変換）
+        // 支払い方法の判定（カードかコンビニか）
         $method = ($request->payment_method === 'コンビニ払い') ? 'konbini' : 'card';
 
         // Stripeチェックアウトセッションの作成
@@ -75,7 +75,7 @@ class PurchaseController extends Controller
             'cancel_url' => route('item.purchase.show', ['item_id' => $item->id]),
         ]);
 
-        // 購入情報をDBに保存（Stripe遷移直前に保存）
+        // 注文データをDBに保存（Stripe遷移直前に保存してSOLD化）
         $item->orderItems()->create([
             'user_id' => $user->id,
             'payment_method' => $request->payment_method,
@@ -86,7 +86,7 @@ class PurchaseController extends Controller
 
         session()->forget('new_address');
 
-        // Stripe決済画面へリダイレクト
+        // Stripeの決済ページへリダイレクト
         return redirect($session->url, 303);
     }
 }
