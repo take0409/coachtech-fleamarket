@@ -91,7 +91,7 @@
                     <td id="payment-display">未選択</td>
                 </tr>
             </table>
-            <button type="button" class="purchase-btn" onclick="document.getElementById('purchase-form').submit()">購入する</button>
+            <button type="button" class="purchase-btn" onclick="submitPurchaseForm()">購入する</button>
         </div>
     </main>
 
@@ -100,6 +100,15 @@
             const select = document.querySelector('select[name="payment_method"]');
             const display = document.getElementById('payment-display');
             display.innerText = select.value;
+        }
+
+        function submitPurchaseForm() {
+            const select = document.querySelector('select[name="payment_method"]');
+            if (!select.value) {
+                alert('支払い方法を選択してください');
+                return;
+            }
+            document.getElementById('purchase-form').submit();
         }
     </script>
 </body>
