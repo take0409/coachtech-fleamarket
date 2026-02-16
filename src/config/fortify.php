@@ -8,10 +8,7 @@ return [
     'username' => 'email',
     'email' => 'email',
     'lowercase_usernames' => true,
-
-    // 修正箇所：リダイレクト先をトップページに変更
     'home' => '/',
-
     'prefix' => '',
     'domain' => null,
     'middleware' => ['web'],
@@ -23,11 +20,8 @@ return [
     'features' => [
         Features::registration(),
         Features::resetPasswords(),
+        Features::emailVerification(), // ← これを追加：メール認証機能を有効化
         Features::updateProfileInformation(),
         Features::updatePasswords(),
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-        ]),
     ],
 ];
