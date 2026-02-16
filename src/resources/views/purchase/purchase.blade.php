@@ -71,7 +71,7 @@
 
                 <div class="section-title">
                     配送先
-                    <a href="{{ route('address.edit', $item->id) }}" class="change-link">変更する</a>
+                    <a href="{{ route('address.edit', ['item_id' => $item->id]) }}" class="change-link">変更する</a>
                 </div>
                 <div class="address-display">
                     <p>〒 {{ $address['postal_code'] ?? '' }}</p>
