@@ -63,6 +63,28 @@ return [
             ]) : [],
         ],
 
+        // ↓↓↓ 新しく追加したテスト用データベース設定 ↓↓↓
+        'mysql_test' => [
+            'driver' => 'mysql',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => 'demo_test',   // テスト用DB名
+            'username' => 'root',        // テスト用ユーザー（権限のあるroot）
+            'password' => 'password',    // あなたのDocker環境のrootパスワード
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => env('DB_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+        // ↑↑↑ ここまで ↑↑↑
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),

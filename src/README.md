@@ -1,46 +1,74 @@
-商品出品・購入プラットフォーム「COACHTECH フリマ」
-本プロジェクトは、特定のユーザー間で商品を売買できる、Figmaのデザインに準拠したフリーマーケット形式のWebアプリケーションです。
+# 1. README.md を模範解答の形式で一気に上書き作成
+cat << 'EOF' > README.md
+# COACHTECH フリマ
 
-1. アプリケーション概要
-誰でも簡単に商品の出品、詳細確認、お気に入り登録、そして購入ができるプラットフォームです。
+## 環境構築
+**Dockerビルド**
+1. \`git clone https://github.com/take0409/coachtech-fleamarket.git\`
+2. DockerDesktopアプリを立ち上げる
+3. \`docker-compose up -d --build\`
 
-2. 実装済み機能一覧
-認証機能: 会員登録、ログイン、メール認証機能。
+> *MacのM1・M2チップのPCの場合、\`no matching manifest for linux/arm64/v8 in the manifest list entries\`のメッセージが表示されビルドができないことがあります。
+エラーが発生する場合は、docker-compose.ymlファイルの「db」内に「platform」の項目を追加で記載してください*
+\`\`\` bash
+db:
+    platform: linux/x86_64
+    image: mysql:8.0.26
+    environment:
+\`\`\`
 
-商品管理:
+**Laravel環境構築**
+1. \`docker-compose exec app bash\`
+2. \`composer install\`
+3. 「.env.example」ファイルを 「.env」ファイルに命名を変更。または、新しく.envファイルを作成
+4. .envに以下の環境変数を追加
+\`\`\` text
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=phper
+DB_PASSWORD=password
 
-商品一覧表示（おすすめ・マイリスト切り替え） 。
+# Stripe決済設定
+STRIPE_KEY=pk_test_...（ご自身の公開鍵）
+STRIPE_SECRET=sk_test_...（ご自身のシークレットキー）
+\`\`\`
+5. アプリケーションキーの作成
+\`\`\` bash
+php artisan key:generate
+\`\`\`
 
-キーワード検索（商品名・ブランド名の部分一致）。
+6. ストレージリンクの作成
+\`\`\` bash
+php artisan storage:link
+\`\`\`
 
-商品詳細表示（複数カテゴリ・コメント一覧）。
+7. マイグレーションの実行
+\`\`\` bash
+php artisan migrate
+\`\`\`
 
-出品・購入:
+8. シーディングの実行
+\`\`\` bash
+php artisan db:seed
+\`\`\`
 
-商品出品（画像選択・複数カテゴリ選択）。
+9. フロントエンドのビルド
+\`\`\` bash
+npm install
+npm run build
+\`\`\`
 
-商品購入（支払い方法選択・配送先住所の一時変更）。
+## 使用技術(実行環境)
+- PHP 8.2.x
+- Laravel 11.x
+- MySQL 8.x
+- Docker / Docker Compose
+- Stripe API (決済)
 
-購入完了時の自動「SOLD」表示。
-
-マイページ:
-
-プロフィール編集（画像・住所・ユーザー名）。
-
-出品した商品・購入した商品の一覧表示。
-
-3. 使用技術
-Language: PHP 8.2.30
-
-Framework: Laravel 12.49.0
-
-Database: MySQL 8.x
-
-Infrastructure: Docker / Docker Compose
-
-4. データベース設計（ER図）
-コード スニペット
-
+## ER図
+\`\`\`mermaid
 erDiagram
     users ||--|| profiles : "1:1"
     users ||--o{ items : "1:N (出品)"
@@ -49,29 +77,14 @@ erDiagram
     items }o--o{ categories : "N:M"
     users ||--o{ favorites : "1:N"
     users ||--o{ comments : "1:N"
-5. 主要テーブル構成
-提出したテーブル仕様書に基づき、以下の構成で実装しています。
+\`\`\`
 
+## URL
+- 開発環境：http://localhost:8080/
+- Mailpit：http://localhost:8025/
+EOF
 
-users: ユーザー認証情報 。
-
-profiles: ユーザー詳細住所およびプロフィール画像。
-
-items: 商品詳細情報（出品者・価格・状態等）。
-
-order_items: 購入履歴および購入時点の配送先情報。
-
-6. バリデーション仕様
-基本設計書の仕様に基づき、以下のバリデーションを実装済みです。
-
-
-郵便番号: 入力必須、ハイフンありの8文字 。
-
-
-商品価格: 数値型、0円以上 。
-
-
-商品説明: 最大255文字 。
-
-
-画像形式: jpegまたはpng 。
+# 2. GitHubへ変更を送信
+git add README.md
+git commit -m "Update README to follow the official format"
+git push origin main
