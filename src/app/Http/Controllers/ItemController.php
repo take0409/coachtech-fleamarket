@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Category;
+use App\Http\Requests\ExposeRequest; // 作成したバリデーションクラスをインポート
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +16,7 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $keyword = $request->input('keyword');
-        $tab = $request->query('tab', 'all'); // デフォルトは「おすすめ(all)」
+        $tab = $request->query('tab', 'all');
         $user = Auth::user();
 
         $query = Item::with(['orderItems', 'favorites']);
@@ -52,16 +53,13 @@ class ItemController extends Controller
         return view('item_sell', compact('categories'));
     }
 
-    public function store(Request $request)
+    /**
+     * 商品出品（ExposeRequestを使用してバリデーションを適用）
+     */
+    public function store(ExposeRequest $request)
     {
-        $request->validate([
-            'name' => 'required|max:255',
-            'price' => 'required|numeric|min:0',
-            'description' => 'required',
-            'condition' => 'required',
-            'img_url' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'categories' => 'required|array',
-        ]);
+        // $request->validate() の記述は不要になりました。
+        // ExposeRequest が自動でバリデーションを行い、失敗時はエラーメッセージと共に元の画面に戻ります。
 
         $imgUrl = 'img/default.jpg'; 
         if ($request->hasFile('img_url')) {

@@ -20,8 +20,8 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => ['required', 'string', 'max:20'],
-            'email'    => ['required', 'string', 'email', 'max:191', 'unique:users'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }
@@ -32,14 +32,13 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required'     => 'お名前を入力してください',
-            'name.max'          => 'お名前は20文字以内で入力してください',
-            'email.required'    => 'メールアドレスを入力してください',
-            'email.email'       => 'メールアドレスはメール形式で入力してください。',
-            'email.unique'      => '指定したメールアドレスは既に使用されています。',
-            'password.required' => 'パスワードを入力してください',
-            'password.min'      => 'パスワードは8文字以上で入力してください',
-            'password.confirmed'=> 'パスワードと一致しません',
+            'name.required'      => 'お名前を入力してください',
+            'email.required'     => 'メールアドレスを入力してください',
+            'email.email'        => 'メールアドレスの形式で入力してください',
+            'email.unique'       => 'このメールアドレスは既に登録されています',
+            'password.required'  => 'パスワードを入力してください',
+            'password.min'       => 'パスワードは8文字以上で入力してください',
+            'password.confirmed' => 'パスワードと確認用パスワードが一致しません',
         ];
     }
 }
