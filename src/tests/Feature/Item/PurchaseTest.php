@@ -19,8 +19,9 @@ class PurchaseTest extends TestCase
      */
     public function test_user_can_purchase_item()
     {
-        $user = User::factory()->create(['email_verified_at' => now()]);
-        $item = Item::factory()->create();
+        /** @var \App\Models\User $user */
+        $user = User::factory()->createOne(['email_verified_at' => now()]);
+        $item = Item::factory()->createOne();
 
         $this->actingAs($user);
 
@@ -63,9 +64,20 @@ class PurchaseTest extends TestCase
      */
     public function test_user_cannot_purchase_own_item()
     {
-        $user = User::factory()->create(['email_verified_at' => now()]);
+        /** @var \Illuminate\Contracts\Auth\Authenticatable|\App\Models\User $user */
+        $user = User::factory()->createOne(['email_verified_at' => now()]);
+
+        // Normalize to a model instance for static analysis/runtime safety
+        if ($user instanceof \Illuminate\Database\Eloquent\Collection) {
+            $user = $user->first();
+        }
+
+        // Ensure $user is present and implements Authenticatable before using actingAs
+        $this->assertNotNull($user);
+        $this->assertInstanceOf(\Illuminate\Contracts\Auth\Authenticatable::class, $user);
+
         // 自分がオーナーの商品
-        $item = Item::factory()->create(['user_id' => $user->id]);
+        $item = Item::factory()->createOne(['user_id' => $user->id]);
 
         $this->actingAs($user);
 

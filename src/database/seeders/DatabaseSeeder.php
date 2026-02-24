@@ -2,24 +2,22 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        /**
+         * 1. 商品データと関連ユーザーを登録
+         * ItemsTableSeederの中で 'test@example.com' ユーザーも作成されるため、
+         * ここでは重複エラーを避けるために個別のUser作成（User::factory）は行いません。
+         */
+        $this->call([
+            ItemsTableSeeder::class,
         ]);
     }
 }

@@ -17,6 +17,7 @@ class MyListTest extends TestCase
      */
     public function test_favorited_items_are_displayed_in_mylist()
     {
+        /** @var \App\Models\User $user */
         $user = User::factory()->create();
         $item = Item::factory()->create(['name' => 'お気に入り商品']);
 
@@ -37,7 +38,9 @@ class MyListTest extends TestCase
      */
     public function test_not_favorited_items_are_not_displayed_in_mylist()
     {
+        /** @var \App\Models\User $user */
         $user = User::factory()->create();
+        Item::factory()->create(['name' => '普通の商品']);
         Item::factory()->create(['name' => '普通の商品']);
 
         $this->actingAs($user);

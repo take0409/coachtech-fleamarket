@@ -18,6 +18,7 @@ class FavoriteTest extends TestCase
     public function test_user_can_favorite_item()
     {
         // メール認証済みのユーザーを作成する
+        /** @var \App\Models\User $user */
         $user = User::factory()->create([
             'email_verified_at' => now(),
         ]);
@@ -40,6 +41,7 @@ class FavoriteTest extends TestCase
      */
     public function test_user_can_unfavorite_item()
     {
+        /** @var \App\Models\User $user */
         $user = User::factory()->create([
             'email_verified_at' => now(),
         ]);

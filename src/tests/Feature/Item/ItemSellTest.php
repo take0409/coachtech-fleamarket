@@ -21,6 +21,7 @@ class ItemSellTest extends TestCase
         // ストレージを偽装
         Storage::fake('public');
 
+        /** @var User $user */
         $user = User::factory()->create(['email_verified_at' => now()]);
         $category = Category::create(['name' => 'テストカテゴリ']);
 

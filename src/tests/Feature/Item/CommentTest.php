@@ -23,6 +23,7 @@ class CommentTest extends TestCase
         ]);
         $item = Item::factory()->create();
 
+        /** @var \App\Models\User $user */
         $this->actingAs($user);
 
         // コメント送信の実行

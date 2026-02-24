@@ -27,10 +27,13 @@ class ProfileTest extends TestCase
             'img_url'     => 'img/default-user.jpg',
         ]);
 
-        $this->actingAs($user);
+/** @var \App\Models\User $user */
+$user = $user->fresh();
 
-        // プロフィール編集画面へアクセス
-        $response = $this->get('/mypage/profile');
+$this->actingAs($user);
+
+// プロフィール編集画面へアクセス
+$response = $this->get('/mypage/profile');
 
         $response->assertStatus(200);
         $response->assertSee('テスト太郎');

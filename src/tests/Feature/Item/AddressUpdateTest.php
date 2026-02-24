@@ -16,6 +16,7 @@ class AddressUpdateTest extends TestCase
      */
     public function test_user_can_update_shipping_address()
     {
+        /** @var User $user */
         $user = User::factory()->create(['email_verified_at' => now()]);
         $item = Item::factory()->create();
 

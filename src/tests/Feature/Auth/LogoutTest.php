@@ -16,6 +16,7 @@ class LogoutTest extends TestCase
     public function test_user_can_logout()
     {
         // 1. 事前にユーザーを作成し、ログイン状態にする
+        /** @var User $user */
         $user = User::factory()->create();
         $this->actingAs($user);
 

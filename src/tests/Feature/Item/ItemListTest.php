@@ -32,6 +32,7 @@ class ItemListTest extends TestCase
     public function test_purchased_items_display_sold_label()
     {
         $seller = User::factory()->create();
+        /** @var \App\Models\User $buyer */
         $buyer = User::factory()->create();
         
         $item = Item::factory()->create([
@@ -60,6 +61,7 @@ class ItemListTest extends TestCase
      */
     public function test_own_items_are_displayed()
     {
+        /** @var \App\Models\User $me */
         $me = User::factory()->create();
         $this->actingAs($me);
 
