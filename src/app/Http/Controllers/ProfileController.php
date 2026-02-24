@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileRequest; // 修正：作成したProfileRequestをインポート
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Item;
 use App\Models\User;
+use App\Models\Profile;
 
 class ProfileController extends Controller
 {
@@ -22,7 +24,7 @@ class ProfileController extends Controller
 
         // タブに応じた絞り込み
         if ($tab === 'buy') {
-            $query->whereHas('orderItems', function ($q) use ($user) {
+            $query->whereHas('order_items', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         } elseif ($tab === 'fav') {
@@ -53,47 +55,32 @@ class ProfileController extends Controller
     }
 
     /**
-     * プロフィール情報の更新（バリデーションの完全日本語化）
+     * プロフィール情報の更新（ProfileRequestを使用してバリデーションを適用）
      */
-    public function update(Request $request)
+    public function update(ProfileRequest $request)
     {
-        $user = Auth::user();
+        // Ensure we have an Eloquent User model instance so ->save() is available
+        $user = User::findOrFail(Auth::id());
 
-        // バリデーションの実行
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'img_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'postal_code' => 'nullable|string|max:8',
-            'address' => 'required|string|max:255',
-        ], [
-            // カスタムエラーメッセージの設定
-            'required' => ':attributeを入力してください',
-            'image' => ':attributeには画像ファイルを指定してください',
-            'mimes' => ':attributeには :values 形式の画像をアップロードしてください',
-            'max' => ':attributeは :max KB以内のものを指定してください',
-        ], [
-            // 項目名（属性名）の日本語定義
-            'name' => 'ユーザー名',
-            'img_url' => 'プロフィール画像',
-            'postal_code' => '郵便番号',
-            'address' => '住所',
-        ]);
+        // バリデーションは ProfileRequest が自動で行うため、
+        // ここに記述されていた $request->validate([...]) は削除しました。
 
-        $user->update(['name' => $request->name]);
+        // Assign and save the name to ensure compatibility with different Auth user types
+        $user->name = $request->name;
+        $user->save();
 
         $profileData = [
-            'postal_code' => $request->postal_code,
+            'post_code' => $request->post_code, // Requestに合わせてpostal_codeからpost_codeに変更
             'address' => $request->address,
             'building' => $request->building,
         ];
-
         if ($request->hasFile('img_url')) {
             $file = $request->file('img_url');
             $path = $file->store('profiles', 'public');
             $profileData['img_url'] = 'storage/' . $path;
         }
 
-        $user->profile()->updateOrCreate(['user_id' => $user->id], $profileData);
+        Profile::updateOrCreate(['user_id' => $user->id], $profileData);
 
         return redirect()->route('mypage.index')->with('message', 'プロフィールを更新しました');
     }
