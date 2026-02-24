@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileRequest; // 修正：作成したProfileRequestをインポート
+use App\Http\Requests\ProfileRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Item;
@@ -12,7 +12,7 @@ use App\Models\Profile;
 class ProfileController extends Controller
 {
     /**
-     * マイページ：ログインユーザー本人だけのデータを抽出し、検索にも対応
+     * マイページ表示
      */
     public function index(Request $request)
     {
@@ -22,7 +22,6 @@ class ProfileController extends Controller
 
         $query = Item::query();
 
-        // タブに応じた絞り込み
         if ($tab === 'buy') {
             $query->whereHas('order_items', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
@@ -35,7 +34,6 @@ class ProfileController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        // キーワード検索
         if (!empty($keyword)) {
             $query->where('name', 'LIKE', "%{$keyword}%");
         }
@@ -46,7 +44,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * プロフィール編集画面の表示
+     * プロフィール編集画面
      */
     public function edit()
     {
@@ -55,31 +53,35 @@ class ProfileController extends Controller
     }
 
     /**
-     * プロフィール情報の更新（ProfileRequestを使用してバリデーションを適用）
+     * プロフィール更新（画像反映ロジックを修正）
      */
     public function update(ProfileRequest $request)
     {
-        // Ensure we have an Eloquent User model instance so ->save() is available
         $user = User::findOrFail(Auth::id());
 
-        // バリデーションは ProfileRequest が自動で行うため、
-        // ここに記述されていた $request->validate([...]) は削除しました。
-
-        // Assign and save the name to ensure compatibility with different Auth user types
+        // ユーザー名の更新
         $user->name = $request->name;
         $user->save();
 
+        // 基本データの準備
         $profileData = [
-            'post_code' => $request->post_code, // Requestに合わせてpostal_codeからpost_codeに変更
-            'address' => $request->address,
-            'building' => $request->building,
+            'post_code' => $request->post_code,
+            'address'   => $request->address,
+            'building'  => $request->building,
         ];
+
+        // プロフィール画像の保存処理
         if ($request->hasFile('img_url')) {
             $file = $request->file('img_url');
+            // storage/app/public/profiles に保存
             $path = $file->store('profiles', 'public');
+            
+            // DBに保存するパスを '/storage/profiles/filename' の形式にする
+            // これにより asset() 関数で正しく表示できるようになります
             $profileData['img_url'] = 'storage/' . $path;
         }
 
+        // データの更新または作成
         Profile::updateOrCreate(['user_id' => $user->id], $profileData);
 
         return redirect()->route('mypage.index')->with('message', 'プロフィールを更新しました');

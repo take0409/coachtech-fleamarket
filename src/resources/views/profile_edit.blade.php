@@ -51,7 +51,10 @@
             @method('PUT')
 
             <div class="avatar-section">
-                <img src="{{ asset($user->profile->img_url ?? 'img/user_default.png') }}" class="current-avatar" id="avatar-preview">
+                <img src="{{ ($user->profile && $user->profile->img_url) ? asset($user->profile->img_url) : asset('img/user_default.png') }}" 
+                     class="current-avatar" 
+                     id="avatar-preview"
+                     onerror="this.src='{{ asset('img/user_default.png') }}'">
                 <label class="file-label">
                     画像を選択する
                     <input type="file" name="img_url" accept="image/*" onchange="previewImage(this);">
@@ -67,8 +70,8 @@
 
             <div class="form-group">
                 <label>郵便番号</label>
-                <input type="text" name="postal_code" value="{{ old('postal_code', $user->profile->postal_code ?? '') }}">
-                @error('postal_code') <div class="error-message">{{ $message }}</div> @enderror
+                <input type="text" name="post_code" value="{{ old('post_code', $user->profile->post_code ?? '') }}">
+                @error('post_code') <div class="error-message">{{ $message }}</div> @enderror
             </div>
 
             <div class="form-group">
