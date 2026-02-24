@@ -12,7 +12,7 @@ use App\Models\Profile;
 class ProfileController extends Controller
 {
     /**
-     * マイページ表示
+     * マイページ：ログインユーザー本人だけのデータを抽出し、検索にも対応
      */
     public function index(Request $request)
     {
@@ -22,8 +22,10 @@ class ProfileController extends Controller
 
         $query = Item::query();
 
+        // タブに応じた絞り込み
         if ($tab === 'buy') {
-            $query->whereHas('order_items', function ($q) use ($user) {
+            // エラー箇所修正：order_items -> orderItems
+            $query->whereHas('orderItems', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         } elseif ($tab === 'fav') {
@@ -34,6 +36,7 @@ class ProfileController extends Controller
             $query->where('user_id', $user->id);
         }
 
+        // キーワード検索
         if (!empty($keyword)) {
             $query->where('name', 'LIKE', "%{$keyword}%");
         }
@@ -44,7 +47,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * プロフィール編集画面
+     * プロフィール編集画面の表示
      */
     public function edit()
     {
@@ -53,7 +56,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * プロフィール更新（画像反映ロジックを修正）
+     * プロフィール情報の更新（ProfileRequestを使用してバリデーションを適用）
      */
     public function update(ProfileRequest $request)
     {
@@ -73,15 +76,11 @@ class ProfileController extends Controller
         // プロフィール画像の保存処理
         if ($request->hasFile('img_url')) {
             $file = $request->file('img_url');
-            // storage/app/public/profiles に保存
             $path = $file->store('profiles', 'public');
-            
-            // DBに保存するパスを '/storage/profiles/filename' の形式にする
-            // これにより asset() 関数で正しく表示できるようになります
             $profileData['img_url'] = 'storage/' . $path;
         }
 
-        // データの更新または作成
+        // プロフィールの更新または作成
         Profile::updateOrCreate(['user_id' => $user->id], $profileData);
 
         return redirect()->route('mypage.index')->with('message', 'プロフィールを更新しました');
