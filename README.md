@@ -28,6 +28,17 @@ Figmaのデザイン案に基づき、ユーザー間で商品を売買できる
 ## 4. データベース設計（ER図）
 システムのデータ構造とリレーションシップを可視化した図解です。
 
+erDiagram
+    users ||--o| profiles : "1:1 プロフィール"
+    users ||--o{ items : "1:N 出品"
+    users ||--o{ order_items : "1:N 購入"
+    items ||--o| order_items : "1:1 決済済"
+    items ||--o{ item_category : "1:N カテゴリ割当"
+    categories ||--o{ item_category : "1:N カテゴリ定義"
+    users ||--o{ favorites : "1:N お気に入り登録"
+    items ||--o{ favorites : "1:N 被お気に入り"
+    users ||--o{ comments : "1:N 投稿コメント"
+    items ||--o{ comments : "1:N 商品コメント"
 
 ## 5. 主要テーブル構成
 提出したテーブル仕様書に基づき、以下の構成で厳格に実装しています。
