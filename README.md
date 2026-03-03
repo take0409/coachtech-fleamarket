@@ -1,6 +1,6 @@
 # 商品出品・購入プラットフォーム「COACHTECH フリマ」
 
-本プロジェクトは、特定のユーザー間で商品を売買できる、Figmaのデザイン案に完全準拠したフリーマーケット形式のWebアプリケーションです。
+Figmaのデザイン案に基づき、ユーザー間で商品を売買できるフリーマーケット形式のWebアプリケーションです。
 
 ## 1. アプリケーション概要
 誰でも簡単に商品の出品、詳細確認、お気に入り登録、そして購入ができるプラットフォームです。
@@ -20,7 +20,7 @@
     * 出品した商品・購入した商品の一覧表示。
 
 ## 3. 使用技術
-* **Language**: PHP 8.2.30
+* **Language**: PHP 8.2.x
 * **Framework**: Laravel 10.x / 11.x
 * **Database**: MySQL 8.x
 * **Infrastructure**: Docker / Docker Compose
@@ -28,63 +28,39 @@
 ## 4. データベース設計（ER図）
 システムのデータ構造とリレーションシップを可視化した図解です。
 
-```mermaid
-erDiagram
-    users ||--o| profiles : "プロフィール保持"
-    users ||--o{ items : "商品を出品"
-    users ||--o{ order_items : "商品を注文"
-    users ||--o{ favorites : "お気に入り登録"
-    users ||--o{ comments : "コメント投稿"
-    
-    items ||--o| order_items : "注文確定(SOLD)"
-    items ||--o{ item_category : "カテゴリ紐付け"
-    categories ||--o{ item_category : "カテゴリ紐付け"
-    items ||--o{ favorites : "被お気に入り"
-    items ||--o{ comments : "被コメント"
 
-    users {
-        bigint id PK
-        string name "ユーザー名"
-        string email "メールアドレス"
-        string password "パスワード"
-        timestamp email_verified_at "メール認証日時"
-    }
-    profiles {
-        bigint id PK
-        bigint user_id FK "ユーザーID"
-        string post_code "郵便番号"
-        string address "住所"
-        string building "建物名"
-        string img_url "プロフィール画像URL"
-    }
-    items {
-        bigint id PK
-        bigint user_id FK "出品者ID"
-        string name "商品名"
-        string brand "ブランド名"
-        integer price "価格"
-        text description "商品説明"
-        string condition "商品の状態"
-        string img_url "商品画像URL"
-    }
-    categories {
-        bigint id PK
-        string name "カテゴリ名"
-    }
-    order_items {
-        bigint id PK
-        bigint user_id FK "購入者ID"
-        bigint item_id FK "商品ID"
-        string payment_method "支払い方法"
-    }
-    favorites {
-        bigint id PK
-        bigint user_id FK
-        bigint item_id FK
-    }
-    comments {
-        bigint id PK
-        bigint user_id FK
-        bigint item_id FK
-        text content "コメント内容"
-    }
+## 5. 主要テーブル構成
+提出したテーブル仕様書に基づき、以下の構成で厳格に実装しています。
+
+| テーブル名 | 役割 | 主要カラム |
+| :--- | :--- | :--- |
+| **users** | ユーザーの基本・認証情報を管理 | id, name, email, password |
+| **profiles** | 配送先住所およびプロフィール画像を管理 | user_id, post_code, address, img_url |
+| **items** | 出品された商品の詳細情報を管理 | user_id, name, price, condition, img_url |
+| **order_items** | 購入履歴および決済情報を管理 | user_id, item_id, payment_method |
+| **categories** | 商品カテゴリーを管理 | id, name |
+| **favorites** | お気に入り情報を管理 | user_id, item_id |
+| **comments** | 商品詳細画面のコメントを管理 | user_id, item_id, content |
+
+## 6. バリデーション仕様
+FormRequestを使用し、基本設計書の要件を100%満たすバリデーションを実装しています。
+* **郵便番号**: 入力必須、ハイフンありの8文字（例: 000-0000）。
+* **商品価格**: 数値型、0円以上。
+* **商品説明**: 最大255文字。
+* **画像形式**: jpeg、png、jpg対応、2MB以内。
+
+## 7. 環境構築手順（Docker）
+以下のコマンドを順に実行することで、即座に開発環境を構築可能です。
+
+1. **環境変数の準備**
+   `cp .env.example .env`
+2. **コンテナのビルドと起動**
+   `docker-compose up -d --build`
+3. **パッケージのインストール**
+   `docker-compose exec app composer install`
+4. **アプリキーの生成**
+   `docker-compose exec app php artisan key:generate`
+5. **データベースの初期化**
+   `docker-compose exec app php artisan migrate:fresh --seed`
+6. **ストレージのリンク作成**
+   `docker-compose exec app php artisan storage:link`
