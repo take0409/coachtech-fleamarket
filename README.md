@@ -39,7 +39,9 @@ erDiagram
     users ||--o{ favorites : "1:N お気に入り登録"
     items ||--o{ favorites : "1:N 被お気に入り"
     users ||--o{ comments : "1:N 投稿コメント"
-    items ||--o{ comments : "1:N 商品コメント"
+    items ||--o{ comments : "1:N 商品コメント"```
+
+
 
 ## 5. 主要テーブル構成
 提出したテーブル仕様書に基づき、以下の構成で厳格に実装しています。
