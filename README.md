@@ -53,6 +53,8 @@ erDiagram
         string name
         integer price
         text description
+        string img_url
+        string condition
     }
     profiles {
         bigint id PK
@@ -60,6 +62,11 @@ erDiagram
         string post_code
         string address
         string img_url
+    }
+    favorites {
+        bigint id PK
+        bigint user_id FK
+        bigint item_id FK
     }
     order_items {
         bigint id PK
