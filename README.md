@@ -74,3 +74,4 @@ erDiagram
         bigint item_id FK
         string payment_method
     }
+    5. 主要テーブル構成（カラム詳細）テーブル名役割主要カラムusersユーザー認証id, name, email, passwordprofiles住所情報user_id, post_code, address, img_urlitems商品データuser_id, name, price, condition, descriptionfavoritesお気に入りuser_id, item_idorder_items決済履歴user_id, item_id, payment_methodcommentsコメントuser_id, item_id, contentcategoriesカテゴリーid, name6. バリデーション仕様郵便番号: 入力必須、ハイフンありの8文字。商品価格: 数値型、0円以上。商品説明: 最大255文字。画像形式: jpeg, png, jpg, 2MB以内。7. 環境構築手順（Docker）cp .env.example .envdocker-compose up -d --builddocker-compose exec app composer installdocker-compose exec app php artisan key:generatedocker-compose exec app php artisan migrate:fresh --seeddocker-compose exec app php artisan storage:link8. URL・ログイン情報トップページ: http://localhost:8080/ログインURL: http://localhost:8080/loginテスト用アカウントメールアドレス: admin@example.comパスワード: password
