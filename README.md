@@ -80,15 +80,15 @@ erDiagram
 
 ## 5. 主要テーブル構成（カラム詳細）
 
-  テーブル名    役割           主要カラム
-  ------------- -------------- ----------------------------------------------
-  users         ユーザー認証   id, name, email, password
-  profiles      住所情報       user_id, post_code, address, img_url
-  items         商品データ     user_id, name, price, condition, description
-  favorites     お気に入り     user_id, item_id
-  order_items   決済履歴       user_id, item_id, payment_method
-  comments      コメント       user_id, item_id, content
-  categories    カテゴリー     id, name
+| テーブル名 | 役割 | 主要カラム |
+| :--- | :--- | :--- |
+| **users** | ユーザー認証 | id, name, email, password |
+| **profiles** | 住所情報 | user_id, post_code, address, img_url |
+| **items** | 商品データ | user_id, name, price, condition, description |
+| **favorites** | お気に入り | user_id, item_id |
+| **order_items** | 決済履歴 | user_id, item_id, payment_method |
+| **comments** | コメント | user_id, item_id, content |
+| **categories** | カテゴリー | id, name |
 
 ## 6. バリデーション仕様
 
