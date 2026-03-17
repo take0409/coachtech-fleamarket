@@ -57,13 +57,11 @@ class Item extends Model
     }
 
     /**
-     * 【修正版】売り切れ判定
-     * ログインユーザーは関係なく、その商品に対して注文(OrderItem)が
-     * 1件でも存在すれば「SOLD」と判定します。
+     * 【確定版】売り切れ判定
+     * ログイン状況に関係なく、OrderItem（注文）が存在すれば一律で「SOLD」
      */
     public function isSold(): bool
     {
-        // orderItemsテーブルにこの商品IDのデータがあるかチェック
         return $this->orderItems()->exists();
     }
 }

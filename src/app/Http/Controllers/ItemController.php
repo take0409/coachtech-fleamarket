@@ -19,22 +19,19 @@ class ItemController extends Controller
         $tab = $request->query('tab', 'all');
         $user = Auth::user();
 
-        // orderItemsをEagerロードすることでN+1問題を防止
+        // orderItemsを読み込んでSOLD判定をスムーズにする
         $query = Item::with(['orderItems', 'favorites']);
 
-        // ログイン中の場合、自分が出品した商品は除外する
-        if ($user) {
-            $query->where('user_id', '!=', $user->id);
-        }
+        // 【元に戻したポイント】自分が出品した商品も「おすすめ」に表示されるようにしました
 
-        // マイリストタブ
+        // マイリストタブの時、自分がお気に入りした商品のみ表示
         if ($tab === 'fav' && $user) {
             $query->whereHas('favorites', function($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         }
 
-        // 検索機能
+        // キーワード検索
         if (!empty($keyword)) {
             $query->where(function($q) use ($keyword) {
                 $q->where('name', 'like', "%{$keyword}%")
