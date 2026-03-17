@@ -11,19 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // すでにテーブルが存在する場合は作成しない（二重作成防止）
-        if (!Schema::hasTable('comments')) {
-            Schema::create('comments', function (Blueprint $table) {
-                $table->id();
-                // 外部キー：誰が投稿したか（ユーザーが削除されたらコメントも消える）
-                $table->foreignId('user_id')->constrained()->onDelete('cascade');
-                // 外部キー：どの商品への投稿か（商品が削除されたらコメントも消える）
-                $table->foreignId('item_id')->constrained()->onDelete('cascade');
-                // コメント本文
-                $table->text('comment');
-                $table->timestamps();
-            });
-        }
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+            // 外部キー：誰が投稿したか
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            // 外部キー：どの商品への投稿か
+            $table->foreignId('item_id')->constrained()->cascadeOnDelete();
+            
+            // コメント本文（Controller/Requestと合わせて content に統一）
+            $table->text('content'); 
+            
+            $table->timestamps();
+        });
     }
 
     /**
