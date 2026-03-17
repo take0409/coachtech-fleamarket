@@ -10,9 +10,9 @@
         .tab-menu a { text-decoration: none; color: #888; margin-right: 20px; padding-bottom: 5px; display: inline-block; }
         .tab-menu a.active { color: #ff4d4d; border-bottom: 2px solid #ff4d4d; font-weight: bold; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 40px; }
-        .item-card { text-decoration: none; color: inherit; background: #fff; border: 1px solid #eee; padding: 10px; position: relative; }
+        .item-card { text-decoration: none; color: inherit; background: #fff; border: 1px solid #eee; padding: 10px; position: relative; display: block; }
         .item-image { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .sold-label { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.8); color: #fff; padding: 2px 8px; font-size: 12px; font-weight: bold; }
+        .sold-label { position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.8); color: #fff; padding: 2px 8px; font-size: 12px; font-weight: bold; z-index: 10; }
     </style>
 </head>
 <body>

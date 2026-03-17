@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Facades\Auth; // 追加
 
 class Item extends Model
 {
@@ -51,11 +50,6 @@ class Item extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    public function orderItem(): HasMany
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-
     public function isFavoritedBy($user): bool
     {
         if (!$user) return false;
@@ -63,21 +57,13 @@ class Item extends Model
     }
 
     /**
-     * 【最適化版】売り切れ判定
-     * ログインしているユーザー自身が購入した商品のみ「SOLD」とする設定。
-     * これにより、新しいメアド（新規ユーザー）でログインした際は
-     * 過去の他人の購入履歴が無視され、全ての商品がフラットな状態になります。
+     * 【修正版】売り切れ判定
+     * ログインユーザーは関係なく、その商品に対して注文(OrderItem)が
+     * 1件でも存在すれば「SOLD」と判定します。
      */
     public function isSold(): bool
     {
-        $user = Auth::user();
-        
-        // ログインしていない場合はSOLDを表示しない
-        if (!$user) {
-            return false;
-        }
-
-        // ログイン中のユーザーIDに紐づく注文データが存在するかチェック
-        return $this->orderItems()->where('user_id', $user->id)->exists();
+        // orderItemsテーブルにこの商品IDのデータがあるかチェック
+        return $this->orderItems()->exists();
     }
 }

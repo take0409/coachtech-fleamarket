@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class ItemController extends Controller
 {
     /**
-     * 商品一覧を表示（おすすめ・マイリスト切り替え ＆ 検索対応）
+     * 商品一覧を表示
      */
     public function index(Request $request)
     {
@@ -19,21 +19,22 @@ class ItemController extends Controller
         $tab = $request->query('tab', 'all');
         $user = Auth::user();
 
+        // orderItemsをEagerロードすることでN+1問題を防止
         $query = Item::with(['orderItems', 'favorites']);
 
-        // 【修正ポイント】ログインしている場合、自分が「出品」した商品は表示しない
+        // ログイン中の場合、自分が出品した商品は除外する
         if ($user) {
             $query->where('user_id', '!=', $user->id);
         }
 
-        // マイリストタブの時、自分がお気に入りした商品のみ表示
+        // マイリストタブ
         if ($tab === 'fav' && $user) {
             $query->whereHas('favorites', function($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         }
 
-        // キーキーワード検索（商品名 または ブランド名）
+        // 検索機能
         if (!empty($keyword)) {
             $query->where(function($q) use ($keyword) {
                 $q->where('name', 'like', "%{$keyword}%")
@@ -58,9 +59,6 @@ class ItemController extends Controller
         return view('item_sell', compact('categories'));
     }
 
-    /**
-     * 商品出品
-     */
     public function store(ExposeRequest $request)
     {
         $imgUrl = 'img/default.jpg'; 
