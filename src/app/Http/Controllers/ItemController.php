@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Category;
-use App\Http\Requests\ExposeRequest; // 作成したバリデーションクラスをインポート
+use App\Http\Requests\ExposeRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,6 +21,11 @@ class ItemController extends Controller
 
         $query = Item::with(['orderItems', 'favorites']);
 
+        // 【修正ポイント】ログインしている場合、自分が「出品」した商品は表示しない
+        if ($user) {
+            $query->where('user_id', '!=', $user->id);
+        }
+
         // マイリストタブの時、自分がお気に入りした商品のみ表示
         if ($tab === 'fav' && $user) {
             $query->whereHas('favorites', function($q) use ($user) {
@@ -28,7 +33,7 @@ class ItemController extends Controller
             });
         }
 
-        // キーワード検索（商品名 または ブランド名）
+        // キーキーワード検索（商品名 または ブランド名）
         if (!empty($keyword)) {
             $query->where(function($q) use ($keyword) {
                 $q->where('name', 'like', "%{$keyword}%")
@@ -54,19 +59,14 @@ class ItemController extends Controller
     }
 
     /**
-     * 商品出品（ExposeRequestを使用してバリデーションを適用）
+     * 商品出品
      */
     public function store(ExposeRequest $request)
     {
-        // $request->validate() の記述は不要になりました。
-        // ExposeRequest が自動でバリデーションを行い、失敗時はエラーメッセージと共に元の画面に戻ります。
-
         $imgUrl = 'img/default.jpg'; 
         if ($request->hasFile('img_url')) {
             $file = $request->file('img_url');
-            // storage/app/public/items に保存
             $path = $file->store('items', 'public');
-            // DBには storage/items/... として保存
             $imgUrl = 'storage/' . $path;
         }
 
@@ -80,7 +80,6 @@ class ItemController extends Controller
             'img_url' => $imgUrl,
         ]);
 
-        // カテゴリの紐付け（複数対応）
         $item->categories()->sync($request->categories);
 
         return redirect()->route('item.index')->with('message', '出品が完了しました');
