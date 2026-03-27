@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Category;
-use App\Http\Requests\ExposeRequest;
+use App\Http\Requests\ItemRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -56,7 +56,7 @@ class ItemController extends Controller
         return view('item_sell', compact('categories'));
     }
 
-    public function store(ExposeRequest $request)
+    public function store(ItemRequest $request)
     {
         $imgUrl = 'img/default.jpg'; 
         if ($request->hasFile('img_url')) {
