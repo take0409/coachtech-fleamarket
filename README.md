@@ -8,29 +8,23 @@ Figmaのデザイン案に基づき、ユーザー間で商品を売買できる
 
 ## 2. 実装済み機能一覧
 
--   **認証機能**: 会員登録、ログイン、メール認証、ログアウト。
--   **商品管理**
-    -   商品一覧表示（おすすめ・マイリスト切り替え）
-    -   キーワード検索（商品名・ブランド名の部分一致）
-    -   商品詳細表示（複数カテゴリ・コメント一覧）
--   **出品・購入**
-    -   商品出品（画像アップロード・複数カテゴリ選択）
-    -   商品購入（支払い方法選択・配送先住所の一時変更）
-    -   購入完了時の自動「SOLD」表示
--   **マイページ**
-    -   プロフィール編集（画像・住所・ユーザー名）
-    -   出品した商品・購入した商品の一覧表示
+* **認証機能**: 会員登録、ログイン、メール認証、ログアウト。
+* **商品管理**: 商品一覧表示、検索、詳細表示。
+* **出品・購入**: 商品出品、購入、SOLD表示。
+* **決済機能**: **Stripeを使用したクレジットカード決済・コンビニ払い対応。**
+* **マイページ**: プロフィール編集、出品・購入履歴一覧。
 
 ## 3. 使用技術
 
--   **Language**: PHP 8.2.x
--   **Framework**: Laravel 10.x / 11.x
--   **Database**: MySQL 8.x
--   **Infrastructure**: Docker / Docker Compose
+* **Language**: PHP 8.2.x
+* **Framework**: Laravel 10.x / 11.x
+* **Database**: MySQL 8.x
+* **Infrastructure**: Docker / Docker Compose
+* **Payment**: **Stripe API**
 
 ## 4. データベース設計（ER図）
 
-``` mermaid
+```mermaid
 erDiagram
     users ||--o| profiles : "1:1 user_id"
     users ||--o{ items : "1:N user_id"
@@ -75,6 +69,7 @@ erDiagram
         bigint user_id FK
         bigint item_id FK
         string payment_method
+        string stripe_checkout_id
     }
 ```
 
@@ -82,24 +77,32 @@ erDiagram
 
 | テーブル名 | 役割 | 主要カラム |
 | :--- | :--- | :--- |
-| **users** | ユーザー認証 | id, name, email, password |
-| **profiles** | 住所情報 | user_id, post_code, address, img_url |
-| **items** | 商品データ | user_id, name, price, condition, description |
-| **favorites** | お気に入り | user_id, item_id |
-| **order_items** | 決済履歴 | user_id, item_id, payment_method |
-| **comments** | コメント | user_id, item_id, content |
-| **categories** | カテゴリー | id, name |
+| users | ユーザー認証 | id, name, email, password |
+| profiles | 住所情報 | user_id, post_code, address, img_url |
+| items | 商品データ | user_id, name, price, condition, description |
+| favorites | お気に入り | user_id, item_id |
+| order_items | 決済・注文履歴 | user_id, item_id, payment_method, stripe_checkout_id |
+| comments | コメント | user_id, item_id, content |
+| categories | カテゴリー | id, name |
 
-## 6. バリデーション仕様
+## 6. Stripeの決済フロー
 
--   郵便番号: 入力必須、ハイフンありの8文字
--   商品価格: 数値型、0円以上
--   商品説明: 最大255文字
--   画像形式: jpeg / png / jpg、2MB以内
+1. ユーザーが購入画面で支払い方法を選択します。
+2. アプリケーションが Stripe Checkout セッションを生成します。
+3. ユーザーは Stripe の決済画面でクレジットカードまたはコンビニ払いを選択して支払いを完了します。
+4. 決済完了後、注文情報を `order_items` テーブルに保存し、`stripe_checkout_id` をあわせて記録します。
+5. 購入済みの商品は一覧画面上で SOLD として表示されます。
 
-## 7. 環境構築手順（Docker）
+## 7. バリデーション仕様
 
-``` bash
+* 郵便番号: 入力必須、ハイフンありの8文字。
+* 商品価格: 数値型、0円以上。
+* 商品説明: 最大255文字。
+* 画像形式: jpeg, png, jpg, 2MB以内。
+
+## 8. 環境構築手順（Docker）
+
+```bash
 cp .env.example .env
 docker-compose up -d --build
 docker-compose exec app composer install
@@ -108,14 +111,10 @@ docker-compose exec app php artisan migrate:fresh --seed
 docker-compose exec app php artisan storage:link
 ```
 
-## 8. URL・ログイン情報
+※Stripe連携には `.env` に `STRIPE_PUBLIC_KEY` と `STRIPE_SECRET_KEY` の設定が必要です。
 
-トップページ\
-http://localhost:8080/
+## 9. URL・ログイン情報
 
-ログインURL\
-http://localhost:8080/login
+トップページ: http://localhost:8080/
 
-テスト用アカウント\
-メールアドレス: admin@example.com\
-パスワード: password
+ログインURL: http://localhost:8080/login
