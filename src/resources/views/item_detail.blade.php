@@ -159,7 +159,7 @@
                                 <img src="{{ asset($comment->user->profile->img_url ?? 'img/user_default.png') }}" class="user-icon">
                                 <span>{{ $comment->user->name }}</span>
                             </div>
-                            <div class="comment-text">{{ $comment->comment }}</div>
+                            <div class="comment-text">{{ $comment->content }}</div>
                         </li>
                     @endforeach
                 </ul>
@@ -168,7 +168,10 @@
                     <p style="font-weight: bold; margin-bottom: 10px;">商品へのコメント</p>
                     <form action="{{ route('comment.store', $item->id) }}" method="POST">
                         @csrf
-                        <textarea name="comment" class="comment-textarea" placeholder="コメントを入力してください" required></textarea>
+                        <textarea name="content" class="comment-textarea" placeholder="コメントを入力してください" required>{{ old('content') }}</textarea>
+                        @error('content')
+                            <div style="color: #ff4b00; font-weight: bold; margin-bottom: 15px;">{{ $message }}</div>
+                        @enderror
                         @auth
                             <button type="submit" class="buy-btn">コメントを送信する</button>
                         @else

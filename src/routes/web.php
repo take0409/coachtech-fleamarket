@@ -43,30 +43,33 @@ Route::middleware(['auth'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| 3. 要メール認証（認証完了まで利用不可の機能：FN012要件）
+| 3. ログイン必須（メール未認証でも利用可能）
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified'])->group(function () {
-    
+Route::middleware(['auth'])->group(function () {
     // マイページ関連
     Route::get('/mypage', [ProfileController::class, 'index'])->name('mypage.index');
     Route::get('/mypage/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/mypage/profile', [ProfileController::class, 'update'])->name('profile.update');
-    
+
     // 出品関連
     Route::get('/sell', [ItemController::class, 'create'])->name('item.create');
     Route::post('/sell', [ItemController::class, 'store'])->name('item.store');
-
-    // 購入関連（Stripe決済含む）
-    Route::get('/purchase/{item_id}', [PurchaseController::class, 'show'])->name('item.purchase.show');
-    Route::post('/purchase/{item_id}', [PurchaseController::class, 'store'])->name('item.purchase.store');
-    
-    // 配送先変更（ここがエラーの原因でした：ルート名を追加）
-    Route::get('/purchase/address/{item_id}', [PurchaseController::class, 'editAddress'])->name('address.edit');
-    Route::post('/purchase/address/{item_id}', [PurchaseController::class, 'updateAddress'])->name('address.update');
 
     // お気に入り・コメント
     Route::post('/item/{item_id}/favorite', [FavoriteController::class, 'store'])->name('favorite.store');
     Route::delete('/item/{item_id}/favorite', [FavoriteController::class, 'destroy'])->name('favorite.destroy');
     Route::post('/item/{item_id}/comment', [CommentController::class, 'store'])->name('comment.store');
+});
+
+/*
+|--------------------------------------------------------------------------
+| 4. 要メール認証（購入関連）
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/purchase/{item_id}', [PurchaseController::class, 'show'])->name('item.purchase.show');
+    Route::post('/purchase/{item_id}', [PurchaseController::class, 'store'])->name('item.purchase.store');
+    Route::get('/purchase/address/{item_id}', [PurchaseController::class, 'editAddress'])->name('address.edit');
+    Route::post('/purchase/address/{item_id}', [PurchaseController::class, 'updateAddress'])->name('address.update');
 });
