@@ -64,10 +64,10 @@ Route::middleware(['auth'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| 4. 要メール認証（購入関連）
+| 4. ログイン必須（購入関連）
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/purchase/{item_id}', [PurchaseController::class, 'show'])->name('item.purchase.show');
     Route::post('/purchase/{item_id}', [PurchaseController::class, 'store'])->name('item.purchase.store');
     Route::get('/purchase/address/{item_id}', [PurchaseController::class, 'editAddress'])->name('address.edit');
