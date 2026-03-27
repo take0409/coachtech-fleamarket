@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddressRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Item;
@@ -29,13 +30,8 @@ class PurchaseController extends Controller
         return view('address_edit', ['item_id' => $item_id]);
     }
 
-    public function updateAddress(Request $request, $item_id)
+    public function updateAddress(AddressRequest $request, $item_id)
     {
-        $request->validate([
-            'postal_code' => 'required|string|max:8',
-            'address'     => 'required|string|max:255',
-        ]);
-
         session(['new_address' => $request->only(['postal_code', 'address', 'building'])]);
 
         return redirect()->route('item.purchase.show', ['item_id' => $item_id]);
